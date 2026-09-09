@@ -3,7 +3,7 @@ from .models import Topic,Entry
 from .forms import TopicForm,EntryForm
 from django.contrib.auth.decorators import login_required
 from django.http import Http404
-def check_topic_owner(request):
+def check_topic_owner(request,topic):
     if topic.owner != request.user:
         raise Http404
 def index(request):
@@ -20,7 +20,7 @@ def topics(request):
 def topic(request,topic_id):
     """显示单个主题以及所有条目"""
     topic = Topic.objects.get(id=topic_id)
-    check_topic_owner(request)
+    check_topic_owner(request,topic)
     entries=topic.entry_set.order_by('-date_added')
     context = {'topic':topic,'entries':entries}
     return render(request,'learning_notes/topic.html',context)
@@ -47,7 +47,7 @@ def new_topic(request):
 def new_entry(request,topic_id):
     """特定主题中增加新条目"""
     topic=Topic.objects.get(id=topic_id)
-    check_topic_owner(request)
+    check_topic_owner(request,topic)
     if request.method != 'POST':
         form = EntryForm()
     else:
@@ -66,7 +66,7 @@ def edit_entry(request,entry_id):
     """编辑已有条目"""
     entry = Entry.objects.get(id=entry_id)
     topic=entry.topic
-    check_topic_owner(request)
+    check_topic_owner(request,topic)
     if request.method != 'POST':
         #初次请求,:使用当前条目填充表单
         form = EntryForm(instance=entry)
