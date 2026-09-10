@@ -100,7 +100,7 @@ python manage.py runserver
 |---|---|---|
 | \`/\` | \`index\` | 欢迎首页 |
 | \`/topics/\` | \`topics\` | 所有主题列表 |
-| \`/topic/<id>/\` | \`topic\` | 单个主题及条目 |
+| \`/topic<id>/\` | \`topic\` | 单个主题及条目 |
 | \`/new_topic/\` | \`new_topic\` | 新建主题 |
 | \`/new_entry/<topic_id>/\` | \`new_entry\` | 添加条目 |
 | \`/edit_entry/<entry_id>/\` | \`edit_entry\` | 编辑条目 |
