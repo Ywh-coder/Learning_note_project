@@ -1,20 +1,25 @@
-{%extends 'learning_notes/base.html'%}
+{% extends 'learning_notes/base.html'%}
+{% block page_header %}
+<h1>{{topic.text}}</h1>
+{% endblock page_header %}
 {% block content %}
-<p>Topic:{{topic.text}}</p>
-<p>Entries:</p>
-<p><a href="{% url 'learning_notes:new_entry' topic.id %}">Add new entry</a>
+<p>
+    <a href="{% url 'learning_notes:new_entry' topic.id %}">
+        Add new entry
+    </a>
 </p>
-<ul>
-    {%for entry in entries %}
-    <li>
-        <p>{{entry.date_added|date:"M d, Y H:i"}}</p>
-        <p>{{entry.text|linebreaks}}</p>
-        <p>
-            <a href="{% url 'learning_notes:edit_entry' entry.id %}">Edit entry</a>
-        </p>
-    </li>
-    {% empty %}
-    <li>There are no entries for this topic yet.</li>
+    {% for entry in entries %}
+    <div class="card mb-3">
+        <!--包含时间戳和编辑连接的标题-->
+        <h4 class="card-header">
+            {{ entry.date_added|date:"M d, Y H:i:s" }}
+            <small><a href="{% url 'learning_notes:edit_entry' entry.id %}">Edit entry</a></small>
+        </h4>
+        <!--包含条目文本的正文-->
+        <div class="card-body">{{entry.text|linebreaks}}</div>
+    </div>
+{% empty %}
+<p> There are no entries for this topic yet.</p>
     {% endfor %}
-</ul>
+
 {% endblock content %}
