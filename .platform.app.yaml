@@ -1,0 +1,41 @@
+name: "ll_project"
+type: "python:3.13"
+relationships:
+
+  database: "db:postgresql"
+#应用程序被暴露到网上时使用的配置
+web:
+    upstream:
+
+      socket_family: unix
+    commands:
+      start: "gunicorn -w 4 -b unix:$SOCKET ll_project.wsgi:application"
+    locations:
+          "/":
+              passthru: true
+          "/static":
+              root: "static"
+              expires: 1h
+              allow: true
+
+#应用程序的永久性磁盘的大小（单位为 MB）
+disk: 512
+# 设置用于读写日志的本地挂载
+
+mounts:
+  "logs":
+    source: local
+    source_path: logs
+# 在应用程序生命周期的不同时间点执行的钩子（hook）
+
+hooks:
+  build: |
+      pip install --upgrade pip 
+      pip install -r requirements.txt 
+      pip install -r requirements_remote.txt 
+      
+      mkdir logs 
+      python manage.py collectstatic 
+      rm -rf logs 
+      deploy: | 
+      python manage.py migrate

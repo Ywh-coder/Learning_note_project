@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/6.1/ref/settings/
 from pathlib import Path
 
 from django.conf.global_settings import LOGIN_REDIRECT_URL
+try:
+    from .local_settings import *
+except ImportError:
+    pass
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,8 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-h4xy^oqkaf1vfatc9i%*gim)hao2=)zx*t#1tcrr16k9-4(g@t"
+# SECRET_KEY is loaded from local_settings.py (gitignored)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -129,11 +132,32 @@ STATIC_URL = "static/"
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    },
-}
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 LOGIN_REDIRECT_URL='learning_notes:index'
 LOGOUT_REDIRECT_URL='learning_notes:index'
 LOGIN_URL="accounts:login"
+#Platform.sh设置
+from platformshconfig import Config
+
+config = Config()
+if config.is_valid_platform():
+    ALLOWED_HOSTS.append('.platformsh.site')
+
+    if config.appDir:
+        STATIC_ROOT=Path(config.appDir)/"static"
+    if config.projectEntropy:
+        SECRET_KEY = config.projectEntropy
+
+    if not config.in_build():
+        db_settings=config.credentials('database')
+        DATABASES={
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': db_settings['path'],
+                'USER': db_settings['username'],
+                'PASSWORD': db_settings['password'],
+                'HOST': db_settings['host'],
+                'PORT': db_settings['port'],
+            }
+        }
+        

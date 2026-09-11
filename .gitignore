@@ -21,3 +21,7 @@ db.sqlite3-journal
 # OS
 .DS_Store
 Thumbs.db
+
+
+# Django local settings
+ll_project/local_settings.py
